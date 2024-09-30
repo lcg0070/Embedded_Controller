@@ -52,17 +52,11 @@ void delay_ms (uint32_t msec){
     uint32_t curTicks;
 
     curTicks = msTicks;
-    // while ((SysTick_val() - curTicks) < msec);
 
-    while ((msTicks - curTicks) < msec);
+    while ((msTicks - curTicks) < msec){}
     msTicks = 0;
 }
-//void delay_ms(uint32_t msec){
-//	uint32_t now=SysTick_val();
-//	if (msec>5000) msec=5000;
-//	if (msec<1) msec=1;
-//	while ((now - SysTick_val()) < msec);
-//}
+
 
 
 // SysTick Current Value Register

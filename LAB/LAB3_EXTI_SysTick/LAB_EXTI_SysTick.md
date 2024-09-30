@@ -5,11 +5,9 @@
 
 **Author:** Lee Chankeun
 
-**Github:** repository link
+**Github:** [go to Github(Link)](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB3_EXTI_SysTick)
 
-**Demo Video:** Youtube link
-
-**PDF version:**
+**Demo Video:** [go to youtube(Link)](https://www.youtube.com/shorts/NPJ26TenSJM)
 
 ## **Introduction**
 
@@ -39,50 +37,6 @@ This lab is about two simple programs using interrupt:
 
 ## **Problem 1: Counting numbers on 7-Segment using EXTI Button**
 
-### **1-1. Create HAL library**
-
-1. [Download sample header files](https://github.com/ykkimhgu/EC-student/tree/main/include/lib-student): **ecEXTI2_student.h, ecEXTI2_student.c**
-2. Rename these files as **ecEXTI2.h, ecEXTI2.c**
-    - You MUST write your name and other information at the top of the library code files.
-    - Save these files in your directory `EC \lib\`.
-3. Declare and define the following functions in your library : **ecEXTI2.h**
-
-**ecEXTI.h**
-
-Copy
-
-```
-void EXTI_init(PinName_t pinName, int trig_type, int priority);
-void EXTI_enable(uint32_t pin);  // mask in IMR
-void EXTI_disable(uint32_t pin);  // unmask in IMR
-uint32_t  is_pending_EXTI(uint32_t pin);
-void clear_pending_EXTI(uint32_t pin);
-```
-
-### **1-2. Procedure**
-
-1. Create a new project under the directory `\EC\LAB\LAB_EXTI`
-- The project name is “**LAB_EXTI”.**
-- Create a new source file named as “**LAB_EXTI.c”**
-
-> You MUST write your name on the source file inside the comment section.
->
-
-2. Include your updated library in `\EC\lib\` to your project.
-
-- **ecGPIO2.h, ecGPIO2.c**
-- **ecRCC2.h, ecRCC2.c**
-- **ecEXTI2.h, ecEXTI2.c**
-1. Use the decoder chip (**74LS47**). Connect it to the breadboard and 7-segment display.
-
-   > Then, you need only 4 Digital out pins of MCU to display from 0 to 9.
->
-2. First, check if every number, 0 to 9, can be displayed properly on the 7-segment.
-3. Then, create a code to display the number counting from 0 to 9 and repeating.
-    - Count up only by pressing the push button (External Interrupt)
-4. You must use your library function of EXTI.
-5. Refer to an [sample code](https://ykkim.gitbook.io/ec/firmware-programming/example-code#button-interrupt)
-
 ### **Configuration**
 
 | Digital In for Button (B1) | Digital Out for 7-Segment decoder |
@@ -93,7 +47,8 @@ void clear_pending_EXTI(uint32_t pin);
 
 ### **Circuit Diagram**
 
-> You need to include the circuit diagram
+
+> <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/EC2024/LAB/LAB1_GPIO_Digital_InOut/images/green_LED.jpeg?raw=true" width=50% height=50%>
 >
 
 image
@@ -128,7 +83,10 @@ Copy
 
 Experiment images and results go here
 
-> Show experiment images /results
+>
+| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/EC2024/LAB/LAB1_GPIO_Digital_InOut/images/blue_LED.jpeg?raw=true" width=50% height=50%>  | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/EC2024/LAB/LAB1_GPIO_Digital_InOut/images/yellow_LED.jpeg?raw=true" width=50% height=50%> |
+|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/EC2024/LAB/LAB1_GPIO_Digital_InOut/images/green_LED.jpeg?raw=true" width=50% height=50%> |  <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/EC2024/LAB/LAB1_GPIO_Digital_InOut/images/red_LED.jpeg?raw=true" width=50% height=50%>   |
 >
 
 Add [demo video link](https://github.com/ykkimhgu/course-doc/blob/master/ec-course/lab/link/README.md)
