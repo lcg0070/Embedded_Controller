@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------\
 @ Embedded Controller by Young-Keun Kim - Handong Global University
 Author           : Lee ChanKeun
-Created          : 09-30-2024
-Modified         : 09-30-2024
+Created          : 10-01-2024
+Modified         : 10-01-2024
 Language/ver     : C in CLION with platformio
 
 Description      : EXTI(7-segment lab)
@@ -22,16 +22,23 @@ int main(void) {
     // Initialiization --------------------------------------------------------
     setup();
 
-    // Inifinite Loop ----------------------------------------------------------
+    // Inifinite Loop ---------------------------------------------------------
     while(1){}
 }
 
+// Interrupt(Button input) ----------------------------------------------------
 void EXTI15_10_IRQHandler(void) {
+    //check pending
     if(is_pending_EXTI(BUTTON_PIN) ) {
-        for(int i=0; i<30000; i++){}    //debouncing
+        //debouncing
+        for(int i=0; i<30000; i++){}
+
+        //displaying function
         sevensegment_display(cnt % 10);
         cnt++;
         if (cnt > 9) cnt = 0;
+
+        //clear pending
         clear_pending_EXTI(BUTTON_PIN);
     }
 }

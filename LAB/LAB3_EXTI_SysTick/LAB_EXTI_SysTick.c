@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------\
 @ Embedded Controller by Young-Keun Kim - Handong Global University
 Author           : Lee ChanKeun
-Created          : 09-30-2024
-Modified         : 09-30-2024
+Created          : 10-01-2024
+Modified         : 10-01-2024
 Language/ver     : C in CLION with platformio
 
 Description      : SysTick(with 7-segment lab)
