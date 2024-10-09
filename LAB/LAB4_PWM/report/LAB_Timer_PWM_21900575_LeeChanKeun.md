@@ -13,7 +13,7 @@
 
 ## **Introduction**
 
-Create a simple program that control a sevo motor and a DC motor with PWM output.
+This lab is a program that controls servo motors and DC motors using PWM
 
 ### **Requirement**
 
@@ -35,109 +35,10 @@ Create a simple program that control a sevo motor and a DC motor with PWM output
 
 ## **Problem 1: RC servo motor**
 
-An RC servo motor is a tiny and light weight motor with high output power. It is used to control rotation angles, approximately 180 degrees (90 degrees in each direction) and commonly applied in RC car, and Small-scaled robots. The angle of the motor can be controlled by the pulse width (duty ratio) of PWM signal. The PWM period should be set at **20ms or 50Hz**. Refer to the datasheet of the RC servo motor for detailed specifications.
+An RC servo motor is a tiny and light weight motor with high output power. It is used to control rotation angles, approximately 180 degrees (90 degrees in each direction) and commonly applied in RC car, and Small-scaled robots. The angle of the motor can be controlled by the pulse width (duty ratio) of PWM signal. The PWM period should be set at **20ms or 50Hz**. Refer to the datasheet of the RC servo motor for detailed specifications.  
 
-image  
+<img src="https://raw.githubusercontent.com/lcg0070/Embedded_Controller/refs/heads/main/LAB/LAB4_PWM/report/images/RC_servo_motor.avif">   
 
-[//]: # (<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/exti_diagram.png?raw=true" width=50% height=50%>)
-
-### **1-1. Create HAL library**
-
-Download files:
-
-- [ecPinNames.h ecPinNames.c](https://github.com/ykkimhgu/EC-student/tree/main/include/lib-student)
-- [ecTIM_student.h, ecTIM_student.c](https://github.com/ykkimhgu/EC-student/tree/main/include/lib-student)
-- [ecPWM_student.h, ecPWM_student.c](https://github.com/ykkimhgu/EC-student/tree/main/include/lib-student)
-
-Then, change the library files as
-
-- ecTIM.h, ecTIM.c
-- ecPWM.h, ecPWM.c
-
-Declare and define the following functions in your library. You must update your header files located in the directory `EC \lib\`.
-
-**ecTIM.h**
-
-Copy
-
-```
-// Timer Period setup
-void TIM_init(TIM_TypeDef *TIMx, uint32_t msec);
-void TIM_period(TIM_TypeDef* TIMx, uint32_t msec);
-void TIM_period_ms(TIM_TypeDef* TIMx, uint32_t msec);
-void TIM_period_us(TIM_TypeDef* TIMx, uint32_t usec);
-
-// Timer Interrupt setup
-void TIM_UI_init(TIM_TypeDef* TIMx, uint32_t msec);
-void TIM_UI_enable(TIM_TypeDef* TIMx);
-void TIM_UI_disable(TIM_TypeDef* TIMx);
-
-// Timer Interrupt Flag
-uint32_t is_UIF(TIM_TypeDef *TIMx);
-void clear_UIF(TIM_TypeDef *TIMx);
-```
-
-**ecPWM.h**
-
-Copy
-
-```
-/* PWM Configuration using PinName_t Structure */
-
-/* PWM initialization */
-// Default: 84MHz PLL, 1MHz CK_CNT, 50% duty ratio, 1msec period
-void PWM_init(PinName_t pinName);
-void PWM_pinmap(PinName_t pinName, TIM_TypeDef **TIMx, int *chN);
-
-/* PWM PERIOD SETUP */
-// allowable range for msec:  1~2,000
-void PWM_period(PinName_t pinName,  uint32_t msec);
-void PWM_period_ms(PinName_t pinName,  uint32_t msec);	// same as PWM_period()
-// allowable range for usec:  1~1,000
-void PWM_period_us(PinName_t pinName, uint32_t usec);
-
-/* DUTY RATIO SETUP */
-// High Pulse width in msec
-void PWM_pulsewidth(PinName_t pinName, uint32_t pulse_width_ms);
-void PWM_pulsewidth_ms(PinName_t pinName, uint32_t pulse_width_ms);  // same as void PWM_pulsewidth
-// Duty ratio 0~1.0
-void PWM_duty(PinName_t pinName, float duty);
-
-```
-
-### **Procedure**
-
-Make a simple program that changes the angle of the RC servo motor that rotates back and forth from 0 deg to 180 degree within a given period of time.
-
-Reset to '0' degree by pressing the push button (PC13).
-
-- Button input has to be an External Interrupt
-- Use Port A Pin 1 as PWM output pin for TIM2_CH2.
-- Use Timer interrupt of period 500msec.
-- Angle of RC servo motor should rotate from 0° to 180° and back 0° at a step of 10° at the rate of 500msec.
-
-You need to observe how the PWM signal output is generated as the input button is pushed, using an oscilloscope. You need to capture the Oscilloscope output in the report.
-
-### 
-
-1. Create a new project under the directory `\repos\EC\LAB\LAB_PWM`
-- The project name is “**LAB_PWM”.**
-- Create a new source file named as “**LAB_PWM_RCmotor.c”**
-
-> You MUST write your name on the source file inside the comment section.
->
-
-2. Include your updated library in `\repos\EC\lib\` to your project.
-
-- **ecPinNames.h** **ecPinNames.c**
-- **ecGPIO.h, ecGPIO.c**
-- **ecRCC.h, ecRCC.c**
-- **ecEXTI.h, ecEXTI.c**
-- **ecTIM.h**, **ecTIM.c**
-- **ecPWM.h** **ecPWM.h**
-1. Connect the RC servo motor to MCU pin (PA1) , VCC and GND
-2. Increase the angle of RC servo motor from 0° to 180° with a step of 10° every 500msec. After reaching 180°, decrease the angle back to 0°. Use timer interrupt IRQ.
-3. When the button is pressed, it should reset to the angle 0° and start over. Use EXT interrupt.
 
 ### **Configuration**
 
@@ -147,7 +48,7 @@ You need to observe how the PWM signal output is generated as the input button i
 | **PWM Pin** | AF (PA1) | Push-Pull, Pull-Up, Fast |
 | **PWM Timer** | TIM2_CH2 (PA1) | TIM2 (PWM) period: 20msec, Duty ratio: 0.5~2.5msec |
 | **Timer Interrupt** | TIM3 | TIM3 Period: 1msec, Timer Interrupt of 500 msec |
-|  |  |  |
+
 
 ### 
 
@@ -156,130 +57,138 @@ You need to observe how the PWM signal output is generated as the input button i
 > You need to include the circuit diagram
 >
 
-image
-
-https://ykkim.gitbook.io/~gitbook/image?url=https%3A%2F%2Fuser-images.githubusercontent.com%2F38373000%2F192134563-72f68b29-4127-42ac-b064-2eda95a9a52a.png&width=768&dpr=4&quality=100&sign=60f2bbed&sv=1
+[//]: # (<img src="https://raw.githubusercontent.com/lcg0070/Embedded_Controller/refs/heads/main/LAB/LAB4_PWM/report/images/RC_servo_motor.avif" width=50% height=50%>)
 
 ### **Discussion**
 
 1. Derive a simple logic to calculate CRR and ARR values to generate x[Hz] and y[%] duty ratio of PWM. How can you read the values of input clock frequency and PSC?
 
-> Answer discussion questions
+> 1. $$f_{timer} = \frac{f_{\text{clk}}}{(\text{PSC} + 1)}$$
+> 2. $$ARR = \frac{f_{\text{timer}}}{\text x} - 1$$
+> 3. $$ARR = \frac{f_{\text{clk}}}{(\text{PSC} + 1) \cdot x} - 1$$
+> 4. $$CRR = \text{ARR} \times \frac{y}{100}$$
+> x is measured in Hz, and y is in percentage. f_clk is the input clock frequency (ex. 84 MHz). Using the known relationship between the clock and the timer, and applying the previously known equations 1 and 2, equations 3 and 4 can be derived. 
 >
-1. What is the smallest and highest PWM frequency that can be generated for Q1?
+2. What is the smallest and highest PWM frequency that can be generated for Q1?
 
-   > Answer discussion questions
->
+   > First, for the Max PWM frequency, you can set it by making the PSC and ARR values 0 to maximize the f_clk value. This will result in the equation f_max = f_clk. Due to the characteristics of the board, the maximum is 100MHz, so 100MHz is the maximum frequency
+   > 
+   > Secondly, when looking at the datasheet of the Nucleo board, calculating the maximum values for ARR and PSC, both are 16-bit, so the maximum value is 2^16 - 1, which is 65535. Also, when using the LSE value (32.768kHz) instead of PLL and calculating the formula, it results in 0.00000762939453125Hz.
 
 ### **Code**
 
 Your code goes here: [ADD Code LINK such as github](https://github.com/ykkimhgu/EC-student/)
 
-Explain your source code with necessary comments.
-
-Copy
 
 ```
-// YOUR MAIN CODE ONLY
-// YOUR CODE
-```
+// /*----------------------------------------------------------------\
+// Author           : Lee ChanKeun
+// Created          : 10-08-2024
+// Modified         : 10-09-2024
+// Language/ver     : C in CLION with platformio
+//
+// Description      : LAB_TimerPWM
+// /----------------------------------------------------------------*/
 
-### **Example Code**
-
-**Sample Code : Timer Interrupt IRQ**
-
-Copy
-
-```
-#include "stm32f411xe.h"
-#include "ecGPIO.h"
-#include "ecRCC.h"
-#include "ecTIM.h"
-
-#define LED_PIN	5
-uint32_t _count = 0;
-void setup(void);
-
-int main(void) {
-	// Initialization --------------------------------------------------
-	setup();
-
-	// Infinite Loop ---------------------------------------------------
-	while(1){}
-}
-
-// Initialization
-void setup(void){
-	RCC_PLL_init();				// System Clock = 84MHz
-	GPIO_init(GPIOA, LED_PIN, OUTPUT);	// calls RCC_GPIOA_enable()
-	TIM_UI_init(TIM2, 1);			// TIM2 Update-Event Interrupt every 1 msec
-	TIM_UI_enable(TIM2);
-}
-
-void TIM2_IRQHandler(void){
-	if(is_UIF(TIM2)){			// Check UIF(update interrupt flag)
-		_count++;
-		if (_count > 1000) {
-			LED_toggle();		// LED toggle every 1 sec
-			_count = 0;
-		}
-		clear_UIF(TIM2); 		// Clear UI flag by writing 0
-	}
-}
-```
-
-**Sample Code : PWM output**
-
-Copy
-
-```
 #include "stm32f411xe.h"
 #include "math.h"
 
 // #include "ecSTM32F411.h"
 #include "ecPinNames.h"
-#include "ecGPIO.h"
-#include "ecSysTick.h"
-#include "ecRCC.h"
-#include "ecTIM.h"
-#include "ecPWM.h"   // ecPWM2.h
+#include "ecGPIO2.h"
+#include "ecSysTick2.h"
+#include "ecRCC2.h"
+#include "ecTIM2.h"
+#include "ecPWM2.h"   // ecPWM2.h
+#include "ecEXTI2.h"
 
 // Definition Button Pin & PWM Port, Pin
-#define BUTTON_PIN 13
-#define PWM_PIN PA_5
+#define PWM_PIN PA_1
 void setup(void);
 
 int main(void) {
-	// Initialization --------------------------------------------------
-	setup();
+    // Initialization --------------------------------------------------
+    setup();
 
-	// Infinite Loop ---------------------------------------------------
-	while(1){
-		LED_toggle();
-		for (int i=0; i<5; i++) {
-			PWM_duty(PWM_PIN, (float)0.2*i);
-			delay_ms(1000);
-		}
-	}
+    // Infinite Loop ---------------------------------------------------
+    while(1){
+    }
 }
 
 // Initialiization
 void setup(void) {
-	RCC_PLL_init();
-	SysTick_init();
+    RCC_PLL_init();
+    SysTick_init();
+    
+    // set timer
+    // set Timer period 50 msec
+    TIM_UI_init(TIM3, M_SEC, 50);
+    TIM_UI_enable(TIM3);
 
-	// PWM of 20 msec:  TIM2_CH1 (PA_5 AFmode)
-	GPIO_init(GPIOA, 5, EC_AF);
-	PWM_init(PWM_PIN);
-	PWM_period(PWM_PIN, 20);   // 20 msec PWM period
+    // set PWM
+    // set PWM period 20 msec
+    PWM_init(PWM_PIN, M_SEC, 1);
+    PWM_period(PWM_PIN, M_SEC ,20);
+
+    // set EXTI button pin
+    GPIO_init(BUTTON_PIN, INPUT);
+    GPIO_otype(BUTTON_PIN, OUTPUT_PUSH_PULL);
+
+    EXTI_init(BUTTON_PIN, FALL,1);
+}
+
+// 2.5ms~0.5ms(180~0)
+// 2/18 -> per 10 degree
+// duty = (0.5+(1/9)*i)/20
+// PWM INTERRUPT
+
+int i=0;                    // parameter for duty calculate
+int timer_flag = 0;         // parameter for change of the direction of servo_motor 
+uint32_t count = 0;         // parameter for timer clk
+
+void TIM3_IRQHandler(void){
+    if(is_UIF(TIM3)){			                            // Check UIF(update interrupt flag)
+        count++;
+        if(count > 9) {
+            PWM_duty(PWM_PIN, (float)(0.5+(1./9.)*i)/20.);  // calculate duty
+            count = 0;
+            if(timer_flag) i--;
+            else i++;;
+            if(i < 1 || i>17) timer_flag = !timer_flag;     // change direction
+        }
+        clear_UIF(TIM3); 		                            // Clear UI flag by writing 0
+    }
+}
+
+// BUTTON Interrupt
+void EXTI15_10_IRQHandler(void) {
+    //check pending
+    if(is_pending_EXTI(BUTTON_PIN) ) {
+        //debouncing
+        for(int i=0; i<30000; i++){}
+
+        // reset all parameter
+        count = 0;
+        i = 0;
+        timer_flag = 0;
+        
+        //clear pending
+        clear_pending_EXTI(BUTTON_PIN);
+    }
 }
 ```
 
 ### **Results**
 
-Experiment images and results
+The following is a photo of the experimental results under different conditions.  
+Unfortunately, when calculating the PWM duty ratio as 2.5ms/20ms, it did not stop precisely at 180 degrees, but instead went beyond 180 degrees before stopping.  
 
-> Show experiment images /results
+
+| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_0.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_1.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_2.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_2.jpeg?raw=true" width=50% height=50%> |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------:| 
+| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_3.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_4.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_5.jpeg?raw=true" width=50% height=50%> |                                                                                                                                                    | 
+| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_6.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_7.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_8.jpeg?raw=true" width=50% height=50%> |                                                                                                                                                    | 
+| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_9.jpeg?raw=true" width=50% height=50%> |                                                                                                                                                    |                                                                                                                                                    |                                                                                                                                                    | 
 >
 
 Add [demo video link](https://github.com/ykkimhgu/course-doc/blob/master/ec-course/lab/link/README.md)
