@@ -1,6 +1,12 @@
-//
-// Created by 이찬근 on 2024. 9. 10..
-//
+/*----------------------------------------------------------------\
+@ Embedded Controller by Young-Keun Kim - Handong Global University
+Author           : Lee ChanKeun
+Created          : 09-10-2024
+Modified         : 08-23-2024
+Language/ver     : C in CLION with platformio
+
+Description      : GPIO functions
+/----------------------------------------------------------------*/
 
 #include "stm32f4xx.h"
 #include "ecRCC2.h"
