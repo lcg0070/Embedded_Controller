@@ -57,13 +57,9 @@ void setup(void) {
 
 }
 
-// 2.5ms~0.5ms(180~0)
-// 2/18 -> per 10 degree
-// duty = (0.5+(1/9)*i)/20
 // PWM INTERRUPT
 int run_flag = 1;
 uint32_t count = 0;
-
 
 float targetPWM = 0.25f;  // pwm for motor input
 float DIR = 0.f;

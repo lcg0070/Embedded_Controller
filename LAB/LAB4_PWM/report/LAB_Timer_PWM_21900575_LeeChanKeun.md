@@ -74,7 +74,7 @@ An RC servo motor is a tiny and light weight motor with high output power. It is
 
 ### **Code**
 
-Initialize TIMER, GPIO, EXTI and PWM register values through setup(void).  
+Initialize TIMER, GPIO, EXTI and PWM register values through ```setup(void)```.  
 Using the ```TIM3_IRQHandler (void)``` function, CLK counts, and ```PWM_duty()``` changes.  
 The trigger condition was created using ```count``` by TIMER.  
 The condition was initialized using ```clear_pending_UIF (TIM3)```.
@@ -214,38 +214,129 @@ This is a problem about controlling a DC motor where pressing a button reverses 
 
 ### **Circuit Diagram**
 
-
-image
-
-https://ykkim.gitbook.io/~gitbook/image?url=https%3A%2F%2Fuser-images.githubusercontent.com%2F38373000%2F192134563-72f68b29-4127-42ac-b064-2eda95a9a52a.png&width=768&dpr=4&quality=100&sign=60f2bbed&sv=1
+<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/DC_diagram.png?raw=true">
 
 ### **Code**
 
-Your code goes here: [ADD Code LINK such as github](https://github.com/ykkimhgu/EC-student/)
+Initialize TIMER, GPIO, EXTI and PWM register values through ```setup(void)```.  
+Using the ```TIM3_IRQHandler (void)``` function, CLK counts, and ```PWM_duty()``` changes.  
+The trigger condition was created using ```count``` by TIMER.  
+The condition was initialized using ```clear_pending_UIF (TIM3)```.
 
-Explain your source code with necessary comments.
+EXTI Interrupt was also used by```EXTI15_10_IRQHandler (void)``` function.
+Change ```DIR```parameter when BUTTON_PIN is pushed.
+To maintain consistent motor output, even when the direction changes, ```duty = fabs(DIR - targetPWM)``` function is used.
 
-Copy
 
 ```
-// YOUR MAIN CODE ONLY
-// YOUR CODE
+/*----------------------------------------------------------------\
+Author           : Lee ChanKeun
+Created          : 10-08-2024
+Modified         : 10-09-2024
+Language/ver     : C in CLION with platformio
+
+Description      : LAB_PWM_DCmotor
+/----------------------------------------------------------------*/
+
+#include "stm32f411xe.h"
+#include "math.h"
+// #include "ecSTM32F411.h"
+#include "ecPinNames.h"
+#include "ecGPIO2.h"
+#include "ecSysTick2.h"
+#include "ecRCC2.h"
+#include "ecTIM2.h"
+#include "ecPWM2.h"   // ecPWM2.h
+#include "ecEXTI2.h"
+
+// Definition Button Pin & PWM Port, Pin
+#define PWM_PIN         PA_0
+#define DIRECTION_PIN   PC_2
+
+void setup(void);
+
+int main(void) {
+    // Initialization --------------------------------------------------
+    setup();
+
+    // Infinite Loop ---------------------------------------------------
+    while(1){
+    }
+}
+
+// Initialiization
+void setup(void) {
+    RCC_PLL_init();
+    SysTick_init();
+
+    TIM_UI_init(TIM3, M_SEC, 500);
+    TIM_UI_enable(TIM3);
+
+    // PWM
+    PWM_init(PWM_PIN, M_SEC, 1);
+    PWM_period(PWM_PIN, M_SEC ,1);
+
+    // Button pin
+    GPIO_init(BUTTON_PIN, INPUT);
+    GPIO_otype(BUTTON_PIN, OUTPUT_PUSH_PULL);
+
+    EXTI_init(BUTTON_PIN, FALL,1);
+
+    GPIO_init(DIRECTION_PIN, OUTPUT);
+    GPIO_otype(DIRECTION_PIN, OUTPUT_PUSH_PULL);
+    GPIO_ospeed(DIRECTION_PIN, HIGH_SPEED);
+
+}
+
+int run_flag = 1;
+uint32_t count = 0;
+
+float targetPWM = 0.25f;  // pwm for motor input
+float DIR = 0.f;
+float duty; // duty with consideration of DIR=1 or 0
+
+void TIM3_IRQHandler(void){
+    if(is_UIF(TIM3)){			// Check UIF(update interrupt flag)
+        if(count > 3) {
+            targetPWM = fabs(1.f - targetPWM);
+            duty = fabs(DIR - targetPWM);
+            PWM_duty(PWM_PIN, duty);
+            count = 0;
+        }
+        count++;
+        clear_UIF(TIM3); 		// Clear UI flag by writing 0
+    }
+}
+
+// BUTTON Interrupt
+void EXTI15_10_IRQHandler(void) {
+    //check pending
+    if(is_pending_EXTI(BUTTON_PIN) ) {
+        //debouncing
+        for(int i=0; i<30000; i++){}
+
+        if(DIR == 0.f) DIR = 1.f;
+        else DIR = 0.f;
+        GPIO_write(DIRECTION_PIN, (int)DIR);
+        duty = fabs(DIR - targetPWM);
+        PWM_duty(PWM_PIN, duty);
+        //clear pending
+        clear_pending_EXTI(BUTTON_PIN);
+    }
+}
 ```
 
 ### **Results**
 
 Experiment images and results
 
-> Show experiment images /results
->
+<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/dc_result.png?raw=true">
 
-Add [demo video link](https://github.com/ykkimhgu/course-doc/blob/master/ec-course/lab/link/README.md)
 
 ### **Reference**
 
 Complete list of all references used (github, blog, paper, etc)
 
-Copy
 
 ```
 
@@ -259,9 +350,7 @@ When, DIR=0 duty=0.8--> PWM 0.8 // 실제 모터에 전달되는 pwm
 
 Whe, DIR=1 duty=0.8--> PWM 0.2 // 실제 모터에 전달되는 PWM
 
-- ** a solution ***
-
-Copy
+SOL)
 
 ```
 float targetPWM;  // pwm for motor input
@@ -276,29 +365,4 @@ SOL) Configure motor PWM period as 1kHz
 
 ### **3. Check and give different Interrupt Priority**
 
-Check if you have different NVIC priority number for each IRQs
-
-(Option) You can write Troubleshooting section
-
-Copy
-
-```
-
-### 4. Print a string for BT (USART1)
-Use `sprintf()`
-
-```c++
-#define _CRT_SECURE_NO_WARNINGS    // sprintf 보안 경고로 인한 컴파일 에러 방지
-#include <stdio.h>     // sprintf 함수가 선언된 헤더 파일
-
-char BT_string[20]=0;
-
-int main()
-{
-	sprintf(BT_string, "DIR:%d PWM: %0.2f\n", dir, duty);    // 문자, 정수, 실수를 문자열로 만듦
-	USART1_write(BT_string, 20);
-	// ...
-}
-```
-
-https://dojang.io/mod/page/view.php?id=352 **
+SOL) Check if you have different NVIC priority number for each IRQs
