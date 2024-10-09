@@ -7,7 +7,7 @@
 
 **Author/Partner:** Lee Chankeun
 
-**Github:** [go to Github(Link)](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB3_EXTI_SysTick)
+**Github:** [go to Github(Link)](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB4_PWM)
 
 **Demo Video:** [go to youtube(Link)](https://www.youtube.com/watch?v=NPJ26TenSJM)
 
@@ -54,10 +54,7 @@ An RC servo motor is a tiny and light weight motor with high output power. It is
 
 ### **Circuit Diagram**
 
-> You need to include the circuit diagram
->
-
-[//]: # (<img src="https://raw.githubusercontent.com/lcg0070/Embedded_Controller/refs/heads/main/LAB/LAB4_PWM/report/images/RC_servo_motor.avif" width=50% height=50%>)
+<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/servo_diagram.png?raw=true">
 
 ### **Discussion**
 
@@ -77,8 +74,13 @@ An RC servo motor is a tiny and light weight motor with high output power. It is
 
 ### **Code**
 
-Your code goes here: [ADD Code LINK such as github](https://github.com/ykkimhgu/EC-student/)
+Initialize TIMER, GPIO, EXTI and PWM register values through setup(void).  
+Using the ```TIM3_IRQHandler (void)``` function, CLK counts, and ```PWM_duty()``` changes.  
+The trigger condition was created using ```count``` by TIMER.  
+The condition was initialized using ```clear_pending_UIF (TIM3)```.
 
+EXTI Interrupt was also used by```EXTI15_10_IRQHandler (void)``` function.
+Reset parameter ```count, i, timer_flag``` when BUTTON_PIN is pushed and ``` is_pending_EXTI (BUTTON_PIN)```is activated
 
 ```
 // /*----------------------------------------------------------------\
@@ -184,42 +186,19 @@ The following is a photo of the experimental results under different conditions.
 Unfortunately, when calculating the PWM duty ratio as 2.5ms/20ms, it did not stop precisely at 180 degrees, but instead went beyond 180 degrees before stopping.  
 
 
-| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_0.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_1.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_2.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_2.jpeg?raw=true" width=50% height=50%> |
-|:--------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------:| 
-| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_3.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_4.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_5.jpeg?raw=true" width=50% height=50%> |                                                                                                                                                    | 
-| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_6.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_7.jpeg?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_8.jpeg?raw=true" width=50% height=50%> |                                                                                                                                                    | 
-| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB3_EXTI_SysTick/report/images/EXTI_9.jpeg?raw=true" width=50% height=50%> |                                                                                                                                                    |                                                                                                                                                    |                                                                                                                                                    | 
->
+|  <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/0_servo.png?raw=true" width=50% height=50%>  | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/10_servo.png?raw=true" width=50% height=50%>  | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/20_servo.png?raw=true" width=50% height=50%>  | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/30_servo.png?raw=true" width=50% height=50%>  |
+|:-------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------:| 
+| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/40_servo.png?raw=true" width=50% height=50%>  | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/50_servo.png?raw=true" width=50% height=50%>  | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/60_servo.png?raw=true" width=50% height=50%>  | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/70_servo.png?raw=true" width=50% height=50%>  | 
+| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/80_servo.png?raw=true" width=50% height=50%>  | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/90_servo.png?raw=true" width=50% height=50%>  | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/100_servo.png?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/110_servo.png?raw=true" width=50% height=50%> | 
+| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/120_servo.png?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/130_servo.png?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/140_servo.png?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/150_servo.png?raw=true" width=50% height=50%> |
+| <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/160_servo.png?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/170_servo.png?raw=true" width=50% height=50%> | <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/180_servo.png?raw=true" width=50% height=50%> |
 
-Add [demo video link](https://github.com/ykkimhgu/course-doc/blob/master/ec-course/lab/link/README.md)
 
 ---
 
 ## **Problem 2: DC motor**
 
-### **Procedure**
-
-Make a simple program that rotates a DC motor that changes the duty ratio from 25% -->75%--> 25% --> and so on.
-
-The rotating speed level changes every 2 seconds.
-
-By pressing the push button (PC13), toggle from Running and stopping the DC motor
-
-**First, you MUST read** [Tutorial: DC motor driver connection](https://ykkim.gitbook.io/ec/ec-course/tutorial/tutorial-dcmotor-motor-driver-connection)
-
-1. Use the same project.
-- Create a new source file named “**LAB_PWM_DCmotor.c”**
-- You need to eliminate the other source file that contains `main()` from the project
-   - e.g. Eliminate "“**LAB_PWM_RCmotor.c”** from the project
-
-> You MUST write your name on the source file inside the comment section.
->
-1. Connect DC motor and DC motor driver.
-- PA_0 for the DC motor PWM
-- PC_2 for Direction Pin
-1. Change DC motor from LOW Speed to HIGH Speed for every 2 seconds
-- e.g. 25% -->75%--> 25% --> and so on.
-1. When Button is pressed, it should PAUSE or CONTINUE motor run
+This is a problem about controlling a DC motor where pressing a button reverses the direction, and the output alternates between 25% and 75% every 2 seconds.
 
 ### **Configuration**
 
@@ -232,12 +211,9 @@ By pressing the push button (PC13), toggle from Running and stopping the DC moto
 | **PWM Pin** | AF (PA0) | Push-Pull, Pull-Up, Fast |
 | **PWM Timer** | TIM2_CH1 (PA0) | TIM2 (PWM) period: **1msec (1kHz)** |
 | **Timer Interrupt** | TIM3 | TIM3 Period: 1msec, Timer Interrupt of 500 msec |
-|  |  |  |
 
 ### **Circuit Diagram**
 
-> You need to include the circuit diagram
->
 
 image
 
