@@ -9,7 +9,7 @@
 
 **Github:** [go to Github(Link)](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB4_PWM)
 
-**Demo Video:** [go to youtube(Link)](https://www.youtube.com/watch?v=NPJ26TenSJM)
+**Demo Video:** [go to youtube(Link)](https://www.youtube.com/watch?v=2nortVAW7HQ)
 
 ## **Introduction**
 
@@ -328,18 +328,17 @@ void EXTI15_10_IRQHandler(void) {
 
 ### **Results**
 
-Experiment images and results
+The following is a photo of the experimental result.
 
 <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/dc_result.png?raw=true">
 
 
 ### **Reference**
 
-Complete list of all references used (github, blog, paper, etc)
-
-
 ```
-
+STMicroelectronics. "UM1724 User manual: STM32 Nucleo-64 boards (MB1136)." STMicroelectronics. https://www.st.com/resource/en/user_manual/dm00105823-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf (accessed October 10, 2024).
+STMicroelectronics. "Description of STM32F4 HAL and low-layer drivers." STMicroelectronics. https://www.st.com/resource/en/user_manual/dm00105879-description-of-stm32f4-hal-and-ll-drivers-stmicroelectronics.pdf (accessed October 10, 2024).
+stackoverflow.com. "Clearing pending EXTI interrupt in stm32f10." https://stackoverflow.com/questions/61533331/clearing-pending-exti-interrupt-in-stm32f103.(accessed October 10, 2024).
 ```
 
 ## **Troubleshooting**
