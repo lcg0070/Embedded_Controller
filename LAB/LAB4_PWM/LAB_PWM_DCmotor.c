@@ -55,8 +55,14 @@ void setup(void) {
     GPIO_otype(DIRECTION_PIN, OUTPUT_PUSH_PULL);
     GPIO_ospeed(DIRECTION_PIN, HIGH_SPEED);
 
+    PWM_duty(PWM_PIN, 0.25);
 }
 
+
+
+// ================================================
+// change State of motor
+// ================================================
 // PWM INTERRUPT
 int run_flag = 1;
 uint32_t count = 0;
@@ -66,6 +72,7 @@ float DIR = 0.f;
 float duty; // duty with consideration of DIR=1 or 0
 
 void TIM3_IRQHandler(void){
+    if(!run_flag) return;
     if(is_UIF(TIM3)){			// Check UIF(update interrupt flag)
         if(count > 3) {
             targetPWM = fabs(1.f - targetPWM);
@@ -85,12 +92,59 @@ void EXTI15_10_IRQHandler(void) {
         //debouncing
         for(int i=0; i<30000; i++){}
 
-        if(DIR == 0.f) DIR = 1.f;
-        else DIR = 0.f;
-        GPIO_write(DIRECTION_PIN, (int)DIR);
-        duty = fabs(DIR - targetPWM);
-        PWM_duty(PWM_PIN, duty);
+        run_flag = !run_flag;
+        if(!run_flag) {
+            duty = 0;
+            PWM_duty(PWM_PIN, duty);
+        }else {
+            duty = fabs(DIR - targetPWM);
+            PWM_duty(PWM_PIN, duty);
+            count = 0;
+        }
+
         //clear pending
         clear_pending_EXTI(BUTTON_PIN);
     }
 }
+
+
+// ================================================
+// change directions
+// ================================================
+
+// // PWM INTERRUPT
+// uint32_t count = 0;
+//
+// float targetPWM = 0.25f;  // pwm for motor input
+// float DIR = 0.f;
+// float duty; // duty with consideration of DIR=1 or 0
+//
+// void TIM3_IRQHandler(void){
+//     if(is_UIF(TIM3)){			// Check UIF(update interrupt flag)
+//         if(count > 3) {
+//             targetPWM = fabs(1.f - targetPWM);
+//             duty = fabs(DIR - targetPWM);
+//             PWM_duty(PWM_PIN, duty);
+//             count = 0;
+//         }
+//         count++;
+//         clear_UIF(TIM3); 		// Clear UI flag by writing 0
+//     }
+// }
+//
+// // BUTTON Interrupt
+// void EXTI15_10_IRQHandler(void) {
+//     //check pending
+//     if(is_pending_EXTI(BUTTON_PIN) ) {
+//         //debouncing
+//         for(int i=0; i<30000; i++){}
+//
+//         if(DIR == 0.f) DIR = 1.f;
+//         else DIR = 0.f;
+//         GPIO_write(DIRECTION_PIN, (int)DIR);
+//         duty = fabs(DIR - targetPWM);
+//         PWM_duty(PWM_PIN, duty);
+//         //clear pending
+//         clear_pending_EXTI(BUTTON_PIN);
+//     }
+// }

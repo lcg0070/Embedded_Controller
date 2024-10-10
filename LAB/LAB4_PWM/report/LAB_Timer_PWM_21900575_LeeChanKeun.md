@@ -9,7 +9,7 @@
 
 **Github:** [go to Github(Link)](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB4_PWM)
 
-**Demo Video:** [go to youtube(Link)](https://www.youtube.com/watch?v=2nortVAW7HQ)
+**Demo Video:** [go to youtube(Link)](https://youtu.be/7i9oOtYHT6E)
 
 ## **Introduction**
 
@@ -224,8 +224,9 @@ The trigger condition was created using ```count``` by TIMER.
 The condition was initialized using ```clear_pending_UIF (TIM3)```.
 
 EXTI Interrupt was also used by```EXTI15_10_IRQHandler (void)``` function.
-Change ```DIR```parameter when BUTTON_PIN is pushed.
-To maintain consistent motor output, even when the direction changes, ```duty = fabs(DIR - targetPWM)``` function is used.
+Change ```run_flag```parameter when ```BUTTON_PIN``` is pushed. This can stop and start the motor
+```duty = fabs(DIR - targetPWM)``` function is used to maintain the output of the motor, regardless direction.
+
 
 
 ```
@@ -286,8 +287,15 @@ void setup(void) {
     GPIO_otype(DIRECTION_PIN, OUTPUT_PUSH_PULL);
     GPIO_ospeed(DIRECTION_PIN, HIGH_SPEED);
 
+    PWM_duty(PWM_PIN, 0.25);
 }
 
+
+
+// ================================================
+// change State of motor
+// ================================================
+// PWM INTERRUPT
 int run_flag = 1;
 uint32_t count = 0;
 
@@ -296,6 +304,7 @@ float DIR = 0.f;
 float duty; // duty with consideration of DIR=1 or 0
 
 void TIM3_IRQHandler(void){
+    if(!run_flag) return;
     if(is_UIF(TIM3)){			// Check UIF(update interrupt flag)
         if(count > 3) {
             targetPWM = fabs(1.f - targetPWM);
@@ -315,11 +324,16 @@ void EXTI15_10_IRQHandler(void) {
         //debouncing
         for(int i=0; i<30000; i++){}
 
-        if(DIR == 0.f) DIR = 1.f;
-        else DIR = 0.f;
-        GPIO_write(DIRECTION_PIN, (int)DIR);
-        duty = fabs(DIR - targetPWM);
-        PWM_duty(PWM_PIN, duty);
+        run_flag = !run_flag;
+        if(!run_flag) {
+            duty = 0;
+            PWM_duty(PWM_PIN, duty);
+        }else {
+            duty = fabs(DIR - targetPWM);
+            PWM_duty(PWM_PIN, duty);
+            count = 0;
+        }
+
         //clear pending
         clear_pending_EXTI(BUTTON_PIN);
     }
