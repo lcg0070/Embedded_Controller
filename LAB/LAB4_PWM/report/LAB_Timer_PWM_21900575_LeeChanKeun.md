@@ -3,7 +3,7 @@
 > Servo motor and DC motor
 >
 
-**Date:** 2024-10-08
+**Date:** 2024-10-10
 
 **Author/Partner:** Lee Chankeun
 
