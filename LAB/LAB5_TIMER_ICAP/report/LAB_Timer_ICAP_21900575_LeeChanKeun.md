@@ -2,9 +2,9 @@
 
 **Author/Partner:** Lee Chankeun
 
-**Github:** [go to Github(Link)](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB4_PWM)
+**Github:** [go to Github(Link)](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB5_TIMER_ICAP)
 
-**Demo Video:** [go to youtube(Link)](https://youtu.be/7i9oOtYHT6E)
+**Demo Video:** [go to youtube(Link)](https://www.youtube.com/watch?v=-YlXUAXmJpU)
 
 ## **Introduction**
 
@@ -168,9 +168,23 @@ This program will measure with this sequence
 
 ### **Code**
 
-Your code goes here: [ADD Code LINK such as github](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB5_TIMER_ICAP)
+[github](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB5_TIMER_ICAP)
 
-Explain your source code with necessary comments.
+ovf_cnt: Counts the number of timer overflows, helping to measure long time intervals.
+distance: Stores the calculated distance based on the time interval.
+timeInterval: Represents the time between the ultrasonic trigger pulse and the received echo.
+time1, time2: Used to capture the start and end times of the echo signal.
+
+Pin Definitions:
+Pin ```PA_6``` is used to send the ultrasonic trigger signal.
+Pin ```PB_6``` is used to receive the echo signal.
+```setup(void)``` function configures the system settings
+
+```RCC and SysTick```: Initialized to set up the system clock and provide delays.  
+```PWM```: Configures TRIG as the PWM output with a 50 ms period and a 10 µs pulse width.    
+Input Capture: Sets ```PB_6``` as the input capture pin.  
+Configures ```TIM4``` to detect rising and falling edges on this pin to measure the time interval between them.  
+
 
 ```c++
 
@@ -255,23 +269,16 @@ void setup(){
 
 ### **Results**
 
-Experiment images and results
-
-<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/dc_result.png?raw=true" width=50% height=50%>
-
+The following image shows the result values from an ultrasonic sensor at distances of 10 cm and 20 cm  
+More results are in the demo video  
+<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB5_TIMER_ICAP/report/images/10cm.jpeg?raw=true" width=50% height=50%>
+<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB5_TIMER_ICAP/report/images/20cm.jpeg?raw=true" width=50% height=50%>
 
 [demo video link](https://www.youtube.com/watch?v=-YlXUAXmJpU)
 
 ## **Reference**
 
-Complete list of all references used (github, blog, paper, etc)
-
-Copy
-
 ```
-
+STMicroelectronics. "UM1724 User manual: STM32 Nucleo-64 boards (MB1136)." STMicroelectronics. https://www.st.com/resource/en/user_manual/dm00105823-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf (accessed October 18, 2024).
+STMicroelectronics. "Description of STM32F4 HAL and low-layer drivers." STMicroelectronics. https://www.st.com/resource/en/user_manual/dm00105879-description-of-stm32f4-hal-and-ll-drivers-stmicroelectronics.pdf (accessed October 18, 2024).
 ```
-
-## **Troubleshooting**
-
-(Option) You can write Troubleshooting section
