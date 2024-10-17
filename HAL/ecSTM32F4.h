@@ -8,6 +8,14 @@
 #include "ecPinNames.h"
 #include "ecRCC2.h"
 #include "ecGPIO2.h"
-
+#include "ecPinNames.h"
+#include "ecRCC2.h"
+#include "ecGPIO2.h"
+#include "ecEXTI2.h"
+#include "ecSysTick2.h"
+#include "ecTIM2.h"
+#include "ecPWM2.h"
+#include "ecICAP2.h"
+#include "ecUART2.h"
 
 #endif //ECSTM32F4_H

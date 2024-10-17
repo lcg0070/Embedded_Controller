@@ -90,14 +90,13 @@ void sevensegment_display_init(PinName_t pinNameA, PinName_t pinNameB, PinName_t
     for(int i = 0; i < PIN_INDEX; i++) {
         GPIO_init(pin[i], OUTPUT);
         GPIO_otype(pin[i], OUTPUT_PUSH_PULL);
-        GPIO_pupd(pin[i], NO_PULLUP_PULLDOWN);
+        GPIO_pupd(pin[i], PULL_DOWN);
         GPIO_ospeed(pin[i], MEDIUM_SPEED);
     }
-    GPIO_pupd(BUTTON_PIN, PULL_UP);
+    GPIO_pupd(BUTTON_PIN, PULL_DOWN);
 }
 
 void sevensegment_display(uint8_t  num) {
-    if (num > 9) num = 0;
     for(int i=0; i < PIN_INDEX; i++) {
         GPIO_write(pin[i], (num >> i) & 1UL);
     }
