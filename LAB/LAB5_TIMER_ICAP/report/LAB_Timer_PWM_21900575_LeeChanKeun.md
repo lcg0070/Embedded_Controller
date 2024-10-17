@@ -104,7 +104,7 @@ Each HC-SR04 module includes an ultrasonic transmitter, a receiver and a control
 
 HC-SR04
 
-https://ykkim.gitbook.io/~gitbook/image?url=https%3A%2F%2Fuser-images.githubusercontent.com%2F91526930%2F198864049-3dba8f8d-aec8-4f9a-8da3-9adc0fe0e4b9.png&width=768&dpr=4&quality=100&sign=7898ae7d&sv=1
+<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB5_TIMER_ICAP/report/images/img.png?raw=true">
 
 **The HC-SR04 Ultrasonic Range Sensor Features:**
 
@@ -118,12 +118,11 @@ https://ykkim.gitbook.io/~gitbook/image?url=https%3A%2F%2Fuser-images.githubuser
 - Range: 2cm - 400cm
 
 
-
 3. Connect the HC-SR04 ultrasonic distance sensor to MCU pins(PA6 - trigger, PB6 - echo), VCC and GND
 
 ### **Measurement of Distance**
 
-The program needs to
+This program will measure with this sequence
 
 - Generate a trigger pulse as PWM to the sensor.
 - Receive echo pulses from the ultrasonic sensor
@@ -135,68 +134,62 @@ The program needs to
 
 ### **Configuration**
 
-| System Clock | PWM | Input Capture |
-| --- | --- | --- |
-| PLL (84MHz) | PA6 (TIM3_CH1) | PB6 (TIM4_CH1) |
-|  | AF, Push-Pull,
-No Pull-up Pull-down, Fast | AF, No Pull-up Pull-down |
-|  | PWM period: 50msec
-pulse width: 10usec | Counter Clock : 0.1MHz (10us)
-TI4 -> IC1 (rising edge)
-TI4 -> IC2 (falling edge) |
+| System Clock | PWM                        | Input Capture                 |
+|--------------|----------------------------|-------------------------------|
+| PLL (84MHz)  | PA6 (TIM3_CH1)             | PB6 (TIM4_CH1)                |
+|              | AF, Push-Pull,             |                               |
+|              | No Pull-up Pull-down, Fast | AF, No Pull-up Pull-down      |
+|              | PWM period: 50msec         | Counter Clock : 0.1MHz (10us) |                         |
+|              | pulse width: 10usec        | TI4 -> IC1 (rising edge)      |
+|              |                            | TI4 -> IC2 (falling edge)     |
+
 
 ### **Circuit Diagram**
 
-> You need to include the circuit diagram
->
-
-image
-
-https://ykkim.gitbook.io/~gitbook/image?url=https%3A%2F%2Fuser-images.githubusercontent.com%2F38373000%2F192134563-72f68b29-4127-42ac-b064-2eda95a9a52a.png&width=768&dpr=4&quality=100&sign=60f2bbed&sv=1
+<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB5_TIMER_ICAP/report/images/diagram.png?raw=true" width=50% height=50%>
 
 ### **Discussion**
 
 1. There can be an over-capture case, when a new capture interrupt occurs before reading the CCR value. When does it occur and how can you calculate the time span accurately between two captures?
 
-> Answer discussion questions
+> There could be an over-capture case by   
+>    1. high capture rates  
+>    2. processing delay 
+>    3. limited counter/timer range   
+> 
+> By applying the formula ```time_span = end_capture_time - start_capture_time + overflow_count*timer_max_value```.  
+> Can calculate the time span accurately between two captures
 >
 1. In the tutorial, what is the accuracy when measuring the period of 1Hz square wave? Show your result.
 
-> Answer discussion questions
->
+> Sensor operates at 40kHz. But when the 1Hz is applied the sensor can't get the value every sampling cycle.  
+> So the detected value had a lot of error or a value of zero was output.  
+> 
 
 ### **Code**
 
-Your code goes here: [ADD Code LINK such as github](https://github.com/ykkimhgu/EC-student/)
+Your code goes here: [ADD Code LINK such as github](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB5_TIMER_ICAP)
 
 Explain your source code with necessary comments.
 
-Copy
+```c++
 
-```
-// YOUR MAIN CODE ONLY
-// YOUR CODE
-```
 
-**Example Code**
-
-Copy
-
-```
-/**
-******************************************************************************
-* @author  SSSLAB
-* @Mod		 2023-10-31 by YKKIM
-* @brief   Embedded Controller:  LAB - Timer Input Capture
-*					 						- with Ultrasonic Distance Sensor
-*
-******************************************************************************
-*/
+// /*----------------------------------------------------------------\
+// Author           : Lee ChanKeun
+// Created          : 10-17-2024
+// Modified         : 10-17-2024
+// Language/ver     : C in CLION with platformio
+//
+// Description      : LAB_TIMER_ICAP
+// /----------------------------------------------------------------*/
 
 #include "stm32f411xe.h"
 #include "math.h"
-#include "ecSTM32F4v2.h"
+#include "ecSTM32F4.h"
 
+
+// variable declare
 uint32_t ovf_cnt = 0;
 float distance = 0;
 float timeInterval = 0;
@@ -219,22 +212,27 @@ int main(void){
 	}
 }
 
+
 void TIM4_IRQHandler(void){
-	if(is_UIF(TIM4)){                     // Update interrupt
-		__________													// overflow count
-		clear_UIF(TIM4);  							    // clear update interrupt flag
+	// Check for Update interrupt
+	if(is_UIF(TIM4)){															  // Update interrupt
+		ovf_cnt++; 																  // overflow count
+		clear_UIF(TIM4);  														  // clear update interrupt flag
 	}
-	if(is_CCIF(TIM4, 1)){ 								// TIM4_Ch1 (IC1) Capture Flag. Rising Edge Detect
-		time1 = __________;									// Capture TimeStart
-		clear_CCIF(TIM4, 1);                // clear capture/compare interrupt flag
+	// Check for TIM4_Ch1 (IC1) Capture Flag (Rising Edge)
+	if(is_CCIF(TIM4, 1)){ 												  // TIM4_Ch1 (IC1) Capture Flag. Rising Edge Detect
+		time1 = ICAP_capture(TIM4, 1);										  // Capture TimeStart
+		clear_CCIF(TIM4, 1);												  // clear capture/compare interrupt flag
 	}
-	else if(__________){ 									// TIM4_Ch2 (IC2) Capture Flag. Falling Edge Detect
-		time2 = __________;									// Capture TimeEnd
-		timeInterval = __________; 	// (10us * counter pulse -> [msec] unit) Total time of echo pulse
-		ovf_cnt = 0;                        // overflow reset
-		clear_CCIF(TIM4,2);								  // clear capture/compare interrupt flag
+	// Check for TIM4_Ch2 (IC2) Capture Flag (Falling Edge)
+	else if(is_CCIF(TIM4, 2)){ 											  // TIM4_Ch2 (IC2) Capture Flag. Falling Edge Detect
+		time2 = ICAP_capture(TIM4, 2);										  // Capture TimeEnd
+		timeInterval = (time2 - time1 + (float)(ovf_cnt * (TIM4->ARR+1))) * 0.01; // (10us * counter pulse -> [msec] unit) Total time of echo pulse
+		ovf_cnt = 0;															  // overflow reset
+		clear_CCIF(TIM4,2);												  // clear capture/compare interrupt flag
 	}
 }
+
 
 void setup(){
 
@@ -242,29 +240,27 @@ void setup(){
 	SysTick_init();
 	UART2_init();
 
-// PWM configuration ---------------------------------------------------------------------
-	__________;			// PA_6: Ultrasonic trig pulse
-	PWM_period_us(TRIG, 50000);    // PWM of 50ms period. Use period_us()
-	PWM_pulsewidth_us(TRIG, 10);   // PWM pulse width of 10us
+	// PWM configuration ---------------------------------------------------------------------
+	PWM_init(PA_6, U_SEC, 1);			// PA_6: Ultrasonic trig pulse
+	PWM_period_us(TRIG, 50000);					// PWM of 50ms period. Use period_us()
+	PWM_pulsewidth_us(TRIG, 10);		// PWM pulse width of 10us
 
-// Input Capture configuration -----------------------------------------------------------------------
-	__________;    	// PB_6 as input caputre
- 	ICAP_counter_us(ECHO, 10);   	// ICAP counter step time as 10us
-	ICAP_setup(ECHO, 1, IC_RISE);  // TIM4_CH1 as IC1 , rising edge detect
-	__________;  // TIM4_CH2 as IC2 , falling edge detect
-
+	// Input Capture configuration -----------------------------------------------------------------------
+	ICAP_init(PB_6);    						// PB_6 as input caputre
+	ICAP_counter_us(ECHO, 10);   			// ICAP counter step time as 10us
+	ICAP_setup(ECHO, 1, IC_RISE);   // TIM4_CH1 as IC1 , rising edge detect
+	ICAP_setup(ECHO, 2, IC_FALL);   // TIM4_CH2 as IC2 , falling edge detect
 }
-
 ```
 
 ### **Results**
 
 Experiment images and results
 
-> Show experiment images /results
->
+<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB4_PWM/report/images/dc_result.png?raw=true" width=50% height=50%>
 
-Add [demo video link](https://github.com/ykkimhgu/course-doc/blob/master/course/lab/link/README.md)
+
+[demo video link](https://www.youtube.com/watch?v=-YlXUAXmJpU)
 
 ## **Reference**
 

@@ -33,6 +33,7 @@
      // High Pulse width in msec
      void PWM_pulsewidth(PinName_t pinName, uint32_t pulse_width_ms);
      void PWM_pulsewidth_ms(PinName_t pinName, uint32_t pulse_width_ms);  // same as void PWM_pulsewidth
+     void PWM_pulsewidth_us(PinName_t pinName, uint32_t pulse_width_us);
      // Duty ratio 0~1.0
      void PWM_duty(PinName_t pinName, float duty);
 
