@@ -2,21 +2,16 @@
 
 **Date:** 2024-10-26
 
-**Author/Partner:**
+**Author/Partner:** Lee Chankeun
 
-**Github:** repository link
+**Github:** [go to Github(Link)](https://github.com/lcg0070/Embedded_Controller/tree/main/LAB/LAB6_Stepper_Motor)
 
-**Demo Video:** Youtube link
+**Demo Video:** [go to youtube(Link)](https://www.youtube.com/watch?v=-YlXUAXmJpU)
 
 ## **Introduction**
 
-In this lab, we will learn how to drive a stepper motor with digital output of GPIOs of MCU. You will use a FSM to design the algorithm for stepper motor control.
+This lab focuses on controlling a stepper motor using the GPIO outputs of a microcontroller, employing a Finite State Machine (FSM) to design the control algorithm.
 
-You must submit
-
-- LAB Report (*.pdf & *.md)
-- Zip source files(main*.c, ecRCC.h, ecGPIO.h, ecSysTick.c etc...).
-  - Only the source files. Do not submit project files
 
 ### **Requirement**
 
@@ -32,110 +27,25 @@ You must submit
 
 ### **Software**
 
-- Keil uVision, CMSIS, EC_HAL library
+- PlatformIO installed IDE, EC_HAL library
 
 ---
 
-## **Tutorial: STM-Arduino**
 
-[A4988 Stepper Motor Driver with Arduino Tutorial (4 Examples)Makerguides.com](https://www.makerguides.com/a4988-stepper-motor-driver-arduino-tutorial/)
-
-!https://www.makerguides.com/wp-content/uploads/2019/02/cropped-makerguides-site-icon-1-300x300.png
-
-We are going to create a simple program that runs a stepper motor using **A4988 motor driver** [See here for A4988 spec sheet](https://www.makerguides.com/wp-content/uploads/2019/02/A4988-Datasheet.pdf)
-
-Here, you only need to give pulses to the driver. You can also change the microstepping setup.
-
-### **Procedure**
-
-1. Connect the motor driver and the stepper motor as follows.
-
-   https://ykkim.gitbook.io/~gitbook/image?url=https%3A%2F%2Fgithub.com%2Fuser-attachments%2Fassets%2Fc1a0ebf0-9275-474f-bb82-faa32f344313&width=768&dpr=4&quality=100&sign=5db436d5&sv=1
-
-
-Supply 5~8 [V] to the driver using a power supply.
-
-1. Create a new project under the directory `\EC\LAB\STEPPER`
-2. Open *Arduino IDE* and Create a new program named as ‘**TU_arduino_Stepper.ino**’.
-3. Write the following code.
-4. upload and run.
-
-Press the reset button(black) and verify the operation.
-
-Copy
-
-```
-// Run Stepper Motor with A4998
-
-int x;
-#define BAUD (9600)
-
-void setup()
-{
-  Serial.begin(BAUD);
-  pinMode(6,OUTPUT); // Enable
-  pinMode(5,OUTPUT); // Step
-  pinMode(4,OUTPUT); // Dir
-  digitalWrite(6,LOW); // Set Enable low
-}
-
-void loop()
-{
-  digitalWrite(6,LOW); // Set Enable low
-  digitalWrite(4,HIGH); // Set Dir high
-  Serial.println("Loop 200 steps (1 rev)");
-  for(x = 0; x < 200; x++) // Loop 200 times
-  {
-    digitalWrite(5,HIGH); // Output high
-    delay(10); // Wait
-    digitalWrite(5,LOW); // Output low
-    delay(100); // Wait
-  }
-  Serial.println("Pause");
-  delay(1000); // pause one second
-}
-```
-
-## **Tutorial: FSM**
-
-You have to program the stepping sequence using the state table. You can define the states using structures.
-
-Read [Tutorial: FSM programming for hints](https://ykkim.gitbook.io/ec/ec-course/lab/lab-smart-mini-fan-with-stm32-duino#example-code)
-
-Copy
-
-```
-// State number
-typedef enum StateNum {
-	S0. S1, S2, S3
-} StateNum;
-
-typedef struct State {
-	uint8_t out;
-	StateNum next[2];
-} State_t;
-
-State_t FSM[4] = {
-	{0x9 , {S1, S3}},
-	{0xA , {S2, S0}},
-	{0x6 , {S3, S1}},
-	{0x5 , {S0, S2}}
-};
-```
 
 ## **Problem : Stepper Motor with 4-input sequence**
 
-For the lab, we are going to use another stepper motor driver of **ULN2003 motor driver** [See here for ULN2003 spec sheet](https://www.electronicoscaldas.com/datasheet/ULN2003A-PCB.pdf))
+For problem 1, will use stepper motor driver **ULN2003 motor driver** [See here for ULN2003 spec sheet](https://www.electronicoscaldas.com/datasheet/ULN2003A-PCB.pdf))
 
-Here, you have to give 4-input pulses in sequence.
+MCU will gives 4-input pulses in sequence.
 
 ### **Hardware Connection**
 
-Read specification sheet of the motor and the motor driver for wiring and min/max input voltage/current.
+Specification sheet of the motor and the motor driver for wiring and min/max input voltage/current.
 
-https://ykkim.gitbook.io/~gitbook/image?url=https%3A%2F%2Fuser-images.githubusercontent.com%2F91526930%2F197428440-9f4a9c8c-2d81-4d0e-a4e2-b4a4b9def44d.png&width=768&dpr=4&quality=100&sign=3c167c0a&sv=1
+<img src="">
 
-https://ykkim.gitbook.io/~gitbook/image?url=https%3A%2F%2Fuser-images.githubusercontent.com%2F91526930%2F197428469-a0d7a8fa-ba4c-482f-8688-ea87cfd9f4e0.png&width=768&dpr=4&quality=100&sign=e51a755b&sv=1
+
 
 ### **Stepper Motor Sequence**
 
