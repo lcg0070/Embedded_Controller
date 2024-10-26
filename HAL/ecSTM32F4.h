@@ -17,5 +17,7 @@
 #include "ecPWM2.h"
 #include "ecICAP2.h"
 #include "ecUART2.h"
+#include "ecStepper.h"
+
 
 #endif //ECSTM32F4_H
