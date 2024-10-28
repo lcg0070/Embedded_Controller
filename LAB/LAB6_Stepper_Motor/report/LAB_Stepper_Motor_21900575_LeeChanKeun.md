@@ -232,17 +232,30 @@ void EXTI15_10_IRQHandler(void) {
 
 
 ### **Results**
+It was confirmed that the motor worked well in each situation
 
-Experiment images and results
+> <img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB6_Stepper_Motor/report/images/stepper_full.png?raw=true" width=50% height=50%>
 
-> (<img src="https://github.com/lcg0070/Embedded_Controller/blob/main/LAB/LAB6_Stepper_Motor/report/images/stepper_motor_datasheet.png?raw=true" width=50% height=50%>)
->
 
  [demo video link](https://youtu.be/-TFCnZ1kNlY)
 
 ## **Reference**
+```
+STMicroelectronics. "UM1724 User manual: STM32 Nucleo-64 boards (MB1136)." STMicroelectronics. https://www.st.com/resource/en/user_manual/dm00105823-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf (accessed October 18, 2024).
+STMicroelectronics. "Description of STM32F4 HAL and low-layer drivers." STMicroelectronics. https://www.st.com/resource/en/user_manual/dm00105879-description-of-stm32f4-hal-and-ll-drivers-stmicroelectronics.pdf (accessed October 18, 2024).
+```
+## **Improvement**
 
-Complete list of all references used (github, blog, paper, etc)
+Improved readability slightly by changing the input parameters to be received as an array instead of receiving each pin individually
+```c++
+void Stepper_init(PinName_t pinNames[]){
 
-## **Troubleshooting**
-
+	for(int i = 0; i < PIN_NUMS ; i++) {
+		myStepper.pins[i] = pinNames[i];
+		GPIO_init(pinNames[i], OUTPUT);
+		GPIO_ospeed(pinNames[i], FAST_SPEED);
+		GPIO_pupd(pinNames[i], NO_PULLUP_PULLDOWN);
+		GPIO_otype(pinNames[i], OUTPUT_PUSH_PULL);
+	}
+}
+```
