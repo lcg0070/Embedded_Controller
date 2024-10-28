@@ -41,9 +41,11 @@ void setup(void){
     Stepper_setSpeed(2);                          	//  set stepper motor speed
 }
 
+
 void EXTI15_10_IRQHandler(void) {
     if (is_pending_EXTI(BUTTON_PIN)) {
         Stepper_stop();
+        while(1){;}
         clear_pending_EXTI(BUTTON_PIN); // cleared by writing '1'
     }
 }
