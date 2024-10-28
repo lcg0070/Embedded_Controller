@@ -88,7 +88,7 @@ void Stepper_pinOut (uint32_t state, uint32_t mode){
 
 void Stepper_setSpeed (long whatSpeed){      // rpm [rev/min]
 	// 60 rpm = step_per_rev 1cycle
-		step_delay = 60000./(whatSpeed * step_per_rev) ;			// Convert rpm to  [msec/step] delay
+		step_delay = 60. * 1000. /(whatSpeed * (long)step_per_rev) ;	// Convert rpm to  [msec/step] delay
 }
 
 
@@ -96,7 +96,7 @@ void Stepper_step(uint32_t steps, uint32_t direction, uint32_t mode){
 	 uint32_t state = 0;
 	 myStepper._step_num = steps;
 
-	 for(; myStepper._step_num > 0; myStepper._step_num--){ // run for step size
+	 for(; myStepper._step_num > 0; myStepper._step_num--){				// run for step size
 		delay_ms(step_delay);
 	    if (mode == FULL)
 	    	state = FSM_full[state].next[direction];
