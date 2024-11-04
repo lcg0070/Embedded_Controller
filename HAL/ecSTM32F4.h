@@ -18,6 +18,10 @@
 #include "ecICAP2.h"
 #include "ecUART2.h"
 #include "ecStepper.h"
+#include "ecADC2.h"
+
+
+// typedef enum _GPIOMODE{ INPUT, OUTPUT, AF, ANALOG} GPIOMODE;
 
 
 #endif //ECSTM32F4_H

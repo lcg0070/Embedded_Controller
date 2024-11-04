@@ -53,8 +53,7 @@ int _read(int file, char* data, int len)
 void USART_write(USART_TypeDef * USARTx, uint8_t *buffer, uint32_t nBytes) {
 	// TXE is set by hardware when the content of the TDR
 	// register has been transferred into the shift register.
-	int i;
-	for (i = 0; i < nBytes; i++) {
+	for (int i = 0; i < nBytes; i++) {
 		// wait until TXE (TX empty) bit is set
 		while (!(USARTx->SR & USART_SR_TXE));
 		// Writing USART_DR automatically clears the TXE flag
