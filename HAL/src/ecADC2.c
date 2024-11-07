@@ -220,8 +220,8 @@ void JADC_init(PinName_t pinName){
 	// 0. Match Port and Pin for JADC channel
 	GPIO_TypeDef *port;
 	unsigned int pin;
-	ecPinmap(pinName, &port, &pin);
 	int chN;
+	ecPinmap(pinName, &port, &pin);
 	ADC_pinmap(pinName, &chN);				// ADC Channel <->Port/Pin mapping
 
 	// GPIO configuration ---------------------------------------------------------------------
@@ -268,7 +268,7 @@ void JADC_init(PinName_t pinName){
 
 	// Configure the injected channel sequence
 	ADC1->JSQR &= ~ADC_JSQR_JSQ4;			// JSQ4 clear bits
-	ADC1->JSQR |= (chN & 0b11111) << ADC_JSQR_JSQ4_Pos; 			// Choose the channel to convert firstly
+	ADC1->JSQR |= (chN & 0x1F) << ADC_JSQR_JSQ4_Pos; 			// Choose the channel to convert firstly
 
 	// 5. Interrupt Enable
 	// Enable JEOC(conversion) interrupt.
@@ -276,12 +276,13 @@ void JADC_init(PinName_t pinName){
 	ADC1->CR1 |= ADC_CR1_JEOCIE;			// JEOC interrupt enable
 
 	// Enable ADC_IRQn
-	NVIC_SetPriority(ADC_IRQn,1); 			//NVIC interrupt setting
+	NVIC_SetPriority(ADC_IRQn,3); 			//NVIC interrupt setting
 	NVIC_EnableIRQ(ADC_IRQn);     			//Enable NVIC
 
 
 	// Hardware Trigger Initialize : TIM3, 1msec, RISE edge
 	JADC_trigger(TIM5, 1, RISE_ADC);
+
 }
 
 void JADC_trigger(TIM_TypeDef* TIMx, int msec, int edge){
@@ -353,10 +354,10 @@ void JADC_sequence(PinName_t *seqCHn, int seqCHnums){
 	ADC1->JSQR |= (seqCHnums-1) << ADC_JSQR_JL_Pos; 		// conversions in the regular channel conversion sequence
 
 	for(int i = 0; i<seqCHnums; i++){
-		ADC1->JSQR &= ~(0x1F<<(15 - 5 * (seqCHnums - i - 1)));	// SQ1 clear bits
-		ADC1->JSQR |= chN[i]<<(15 - 5 * (seqCHnums - i - 1));		// Choose the channel to convert sequence
-		//ADC1->JSQR &= ~(0x1FUL << i*5);
-		//ADC1->JSQR |= chN[i] << i*5;
+		// ADC1->JSQR &= ~(0x1F<<(15 - 5 * (seqCHnums - i - 1)));	// SQ1 clear bits
+		// ADC1->JSQR |= chN[i]<<(15 - 5 * (seqCHnums - i - 1));		// Choose the channel to convert sequence
+		ADC1->JSQR &= ~(0x1F << (i*5));
+		ADC1->JSQR |= (chN[i] & 0x1F) << (i*5);
 	}
 
 	// Start ADC

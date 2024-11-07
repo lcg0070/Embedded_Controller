@@ -19,7 +19,7 @@
 #define FULL 1
 
 #define DIR_CCW 1
-#define DIR_CCW 0
+#define DIR_CW 0
 
  /* Stepper Motor */
  //stepper motor function

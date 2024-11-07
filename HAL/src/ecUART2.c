@@ -213,14 +213,6 @@ void UART1_init(void){
 	// **********************************************************
 	USART_setting(USART1, PA_9, PA_10, 9600);
 }
-void UART2_init(void){
-	// ********************** USART 2 ***************************
-	// PA2 = USART2_TX
-	// PA3 = USART2_RX
-	// Alternate function(AF7), High Speed, Push pull, Pull up
-	// **********************************************************
-	USART_setting(USART2, PA_2, PA_3, 9600);
-}
 
 void UART1_baud(uint32_t baud){
 	UART_baud(USART1, baud);

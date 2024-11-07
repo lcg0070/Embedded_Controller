@@ -58,14 +58,17 @@ uint32_t ADC_read(void);
 /////////////////////////////////////////////////////
 // Conversion mode change: CONT, SINGLE / Operate both ADC,JADC
 void ADC_conversion(int convMode);
-void ADC_trigger(TIM_TypeDef* TIMx, int msec, int edge);
 
-// JADC setting
-void JADC_trigger(TIM_TypeDef* TIMx, int msec, int edge);
+void ADC_trigger(TIM_TypeDef* TIMx, int msec, int edge);
+void JADC_trigger(TIM_TypeDef* TIMx, int msec, int edge); // JADC setting
 
 // Private Function
 void ADC_pinmap(PinName_t pinName, uint32_t *chN);
 
+void clear_ADC_JEOC(void);
+
 void JADC_start(void);
+uint32_t is_ADC_JEOC(void);
+uint32_t JADC_read(int JDRn);
 
 #endif //ECADC2_H
