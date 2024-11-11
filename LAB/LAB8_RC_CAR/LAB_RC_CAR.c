@@ -87,8 +87,8 @@ void USART1_IRQHandler() {  // USART1 interrupt handler
                 arrow_flag = 1;
             }
         }
-        Direction(btData, arrow_flag);             // Execute direction control based on btData
-        Direction_display(btData, arrow_flag);     // Display current direction command
+        cal_direction(btData, arrow_flag);             // Execute direction control based on btData
+        direction_display(btData, arrow_flag);         // Display current direction command
         if( btData == MODE_CHANGE1 || btData == MODE_CHANGE2) {
             mode = mode_toggle(mode);
         }

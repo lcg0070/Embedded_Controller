@@ -10,8 +10,6 @@
 uint32_t value1, value2;
 PinName_t seqCHn[2] = {IR_PIN_1, IR_PIN_2};
 
-int flag = 0;
-int dir = FORWARD_MOTOR;
 
 //Ultrasonic parameter//
 uint32_t ovf_cnt = 0;
@@ -68,7 +66,7 @@ void DC_setup() {
     GPIO_write(DIRECTION_PIN1, LOW);
     GPIO_write(DIRECTION_PIN2, LOW);
 
-    set_car_speed(STOP_MOTOR_SPEED, STOP_MOTOR_SPEED);
+    set_car_speed(STOP_MOTOR_SPEED, STOP_MOTOR_SPEED, FORWARD);
 }
 
 
@@ -85,7 +83,6 @@ void ultrasonic_setup() {
     ICAP_setup(ECHO, 1, IC_RISE);   // TIM4_CH1 as IC1 , rising edge detect
     ICAP_setup(ECHO, 2, IC_FALL);   // TIM4_CH2 as IC2 , falling edge detect
 
-
 }
 
 
@@ -94,9 +91,26 @@ void UART1_setup() {
     UART1_baud(BAUD_9600);
 }
 
-void set_car_speed(float speed_left, float speed_right) {
-    PWM_duty(PWM_PIN1, speed_left);
-    PWM_duty(PWM_PIN2, speed_right);
+
+float speed_duty[2] = { 0, 0 };
+void set_car_speed(float speed_left, float speed_right, float direction) {
+    speed_duty[0] = speed_left;
+    speed_duty[1] = speed_right;
+
+    for (int i = 0; i < 2; i++) {
+        if(speed_duty[i] > HIGH_MOTOR_SPEED) speed_duty[i] = HIGH_MOTOR_SPEED;
+        if(speed_duty[i] < LOW_MOTOR_SPEED)  speed_duty[i] = LOW_MOTOR_SPEED;
+        speed_duty[i] = CAL_DUTY(direction, speed_duty[i]);
+    }
+
+    PWM_duty(PWM_PIN1, speed_duty[0]);
+    PWM_duty(PWM_PIN2, speed_duty[1]);
+}
+
+void set_car_dir(float direction) {
+
+    GPIO_write(DIRECTION_PIN1, (int)direction);
+    GPIO_write(DIRECTION_PIN2, (int)direction);
 }
 
 
@@ -107,7 +121,7 @@ void set_car_speed(float speed_left, float speed_right) {
 //
 // MOTOR CONTROL
 //
-uint8_t before_mode = MANUAL;
+uint8_t before_mode = AUTO;
 uint8_t initial_state = 0;
 void motor_control(uint32_t IR_value[], float ultrasonic_distance, uint8_t bt_data ,uint8_t mode_flag){
     if (before_mode != mode_flag) initial_state = 1;
@@ -128,35 +142,31 @@ void motor_control(uint32_t IR_value[], float ultrasonic_distance, uint8_t bt_da
 void motor_auto(uint32_t IR_value[], float ultrasonic_distance, uint8_t initial_state) {
     // initialize
     if (initial_state == 1) {
-        GPIO_write(DIRECTION_PIN1, 0);
-        GPIO_write(DIRECTION_PIN2, 0);
+        set_car_dir(FORWARD_DIR);
     }
     //default
-    set_car_speed(HIGH_MOTOR_SPEED, HIGH_MOTOR_SPEED);
+    set_car_speed(HIGH_MOTOR_SPEED, HIGH_MOTOR_SPEED, FORWARD_DIR);
     // // right turn
     if (IR_value[0] > IR_THRESHOLD && IR_value[1] < IR_THRESHOLD) {
-        set_car_speed(LOW_MOTOR_SPEED, HIGH_MOTOR_SPEED);
+        set_car_speed(LOW_MOTOR_SPEED, HIGH_MOTOR_SPEED, FORWARD_DIR);
         // left turn
     }else if((IR_value[0] < IR_THRESHOLD && IR_value[1] > IR_THRESHOLD)) {
-        set_car_speed(HIGH_MOTOR_SPEED, LOW_MOTOR_SPEED);
+        set_car_speed(HIGH_MOTOR_SPEED, LOW_MOTOR_SPEED, FORWARD_DIR);
     }
     // emergency stop
     if (ultrasonic_distance < ULTRASONIC_THRESHOLD) {
-        set_car_speed(STOP_MOTOR_SPEED, STOP_MOTOR_SPEED);
+        set_car_speed(STOP_MOTOR_SPEED, STOP_MOTOR_SPEED, FORWARD_DIR);
     }
 }
 
 void motor_manual(uint8_t bt_data, uint8_t initial_state) {
+
     // initialize
     if (initial_state == 1) {
-        GPIO_write(DIRECTION_PIN1, 0);
-        GPIO_write(DIRECTION_PIN2, 0);
-
-        set_car_speed(STOP_MOTOR_SPEED, STOP_MOTOR_SPEED); // Stop car
-
+        set_car_dir(FORWARD_DIR);
+        set_car_speed(STOP_MOTOR_SPEED, STOP_MOTOR_SPEED, FORWARD_DIR); // Stop car
     }
-    // Direction(bt_data, );
-    // Direction_display(bt_data);
+
 }
 
 int count = 0;
@@ -165,11 +175,8 @@ void led_control(uint8_t mode_flag) {
         if (mode_flag == AUTO) {
             count++;
             if (count <= 1000) {
-
                 GPIO_write(LED_PIN, 0);
-
             }else if(count <= 2000) {
-
                 GPIO_write(LED_PIN, 1);
             }else {
                 count = 0;
@@ -182,6 +189,7 @@ void led_control(uint8_t mode_flag) {
 }
 
 uint8_t mode_toggle(uint8_t mode_flag) {
+
     if (mode_flag == MANUAL) return AUTO;
     return MANUAL;
 }
@@ -221,98 +229,88 @@ float ultrasonic_control(){
     return timeInterval;
 }
 
-
 // get distance from ultrasonic sensor
 float get_distance(float timecount) {
     return timecount * 340.0 / 2.0 / 10.0; 	// [mm] -> [cm]
 }
 
 
-
-
 // =======================================
 // MANUAL MODE
 // =======================================
-int forward_ready = 1;
-int backward_ready = 0;
 
 //Motor parameter//
-float direction = 0.0f;
-float targetPWM = 0.0f;
+float right_duty = 0.0f;
+float left_duty = 0.0f;
 float duty      = 0.f;
 
-void Direction(uint8_t direction, uint8_t arrow_flag) {
+float dir       = 0.0f;
+float steer_state   = 0;
+float vel_state     = 0;
+
+void cal_direction(uint8_t direction, uint8_t arrow_flag) {
+
     if (arrow_flag) {
         switch (direction) {
-
             case UP:  // Increase speed
-                if ((forward_ready || backward_ready) && duty < HIGH_MOTOR_SPEED) {
-                    duty += DUTY_CYCLE_STEP;
-                    if (duty >= HIGH_MOTOR_SPEED) {
-                        duty = HIGH_MOTOR_SPEED;  // Keep speed at max level
-                    }
-                    set_car_speed(duty, duty);
-                }
+                vel_state++;
             break;
-
             case DOWN:  // Decrease speed
-                if (duty > STOP_MOTOR_SPEED) {
-                    duty -= DUTY_CYCLE_STEP;
-                    if (duty < STOP_MOTOR_SPEED) duty = STOP_MOTOR_SPEED; // Limit to min
-                    set_car_speed(duty, duty);
-                }
+                vel_state--;
             break;
 
             case RIGHT:  // Turn right with reduced speed on one side
-                if (duty > STOP_MOTOR_SPEED) {
-                    GPIO_write(DIRECTION_PIN1, 0);
-                    GPIO_write(DIRECTION_PIN2, 0);
-                    PWM_duty(PWM_PIN1, duty * 0.5f); // Reduce right side speed
-                    PWM_duty(PWM_PIN2, duty);       // Maintain left side speed
-                }
+                steer_state++;
             break;
 
             case LEFT:  // Turn left with reduced speed on one side
-                if (duty > STOP_MOTOR_SPEED) {
-                    GPIO_write(DIRECTION_PIN1, 0);
-                    GPIO_write(DIRECTION_PIN2, 0);
-                    PWM_duty(PWM_PIN1, duty);       // Maintain right side speed
-                    PWM_duty(PWM_PIN2, duty * 0.5f); // Reduce left side speed
-                }
+                steer_state--;
             break;
         }
+        if(vel_state > V3) vel_state = V3;
+        if(vel_state < V0) vel_state = V0;
+        if(steer_state > S_3) steer_state = S_3;
+        if(steer_state < S_m3) steer_state = S_m3;
+
+
+        left_duty = vel_state * DUTY_CYCLE_STEP;
+        right_duty = vel_state * DUTY_CYCLE_STEP;
+
+        if(steer_state < 0) {
+            left_duty -= steer_state * DUTY_CYCLE_STEP;
+        }
+        if(steer_state > 0) {
+            right_duty -= steer_state * DUTY_CYCLE_STEP;
+        }
+        set_car_speed(left_duty, right_duty, dir);
+
     }else{
         switch (direction) {
             case FORWARD:  // Set forward mode and stop the car
-                GPIO_write(DIRECTION_PIN1, 0);
-                GPIO_write(DIRECTION_PIN2, 0);
-
-                set_car_speed(STOP_MOTOR_SPEED, STOP_MOTOR_SPEED);  //stop
+                set_car_dir(FORWARD_DIR);
+                set_car_speed(STOP_MOTOR_SPEED, STOP_MOTOR_SPEED, FORWARD_DIR);  //stop
+                dir = FORWARD_DIR;
                 duty = STOP_MOTOR_SPEED;
-                forward_ready = 1;      // Ready to move forward
-                backward_ready = 0;
             break;
 
             case BACKWARD:  // Set backward mode and stop the car
-                GPIO_write(DIRECTION_PIN1, 1);
-                GPIO_write(DIRECTION_PIN2, 1);
-                set_car_speed(HIGH_MOTOR_SPEED, HIGH_MOTOR_SPEED);  //stop
+                set_car_dir(BACKWARD_DIR);
+                set_car_speed(HIGH_MOTOR_SPEED, HIGH_MOTOR_SPEED, BACKWARD_DIR);  //stop
+                dir = BACKWARD_DIR;
                 duty = HIGH_MOTOR_SPEED;
-                forward_ready = 0;      // Ready to move forward
-                backward_ready = 1;
             break;
 
             case STOP:  // Stop the car
-                set_car_speed(STOP_MOTOR_SPEED, STOP_MOTOR_SPEED); // Set speed to 0
+                set_car_speed(STOP_MOTOR_SPEED, STOP_MOTOR_SPEED, FORWARD_DIR); // Set speed to 0
+                dir = FORWARD_DIR;
                 duty = STOP_MOTOR_SPEED;
-                forward_ready = 0;
-                backward_ready = 0;
             break;
         }
     }
 }
 
-void Direction_display(uint8_t direction, uint8_t arrow_flag){
+void direction_display(uint8_t direction, uint8_t arrow_flag){
+
     if (arrow_flag) {
         switch (direction) {
             case RIGHT:

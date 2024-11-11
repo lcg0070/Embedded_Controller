@@ -33,15 +33,36 @@
 //=============================================================================
 // motor speed
 //=============================================================================
-#define    HIGH_MOTOR_SPEED         (1.0f)
-#define    MIDDLE_MOTOR_SPEED       (0.6f)
-#define    LOW_MOTOR_SPEED          (0.3f)
-#define    STOP_MOTOR_SPEED         (0.0f)
+#define    HIGH_MOTOR_SPEED             (1.0f)
+#define    MIDDLE_MOTOR_SPEED           (0.66f)
+#define    LOW_MOTOR_SPEED              (0.33f)
+#define    STOP_MOTOR_SPEED             (0.0f)
 
-#define    DUTY_CYCLE_STEP          (0.33f)
+#define    DUTY_CYCLE_STEP              (0.33f)
 
-#define    FORWARD_MOTOR            (1.f)
-#define    BACKWARD_MOTOR           (0.f)
+#define    FORWARD_DIR                  (0.f)
+#define    BACKWARD_DIR                 (1.f)
+
+#define    CAL_DUTY(direction, duty)    (fabsf((direction) - (duty)))
+
+typedef enum {
+    V0 = 0,
+    V1 = 1,
+    V2 = 2,
+    V3 = 3
+}VEL_CMD;
+
+typedef enum {
+    S_m3    = -3,
+    S_m2    = -2,
+    S_m1    = -1,
+    S_0     = 0,
+    S_1     = 1,
+    S_2     = 2,
+    S_3     = 3
+}STEER_CMD;
+
+
 //=============================================================================
 // mode
 //=============================================================================
@@ -77,7 +98,7 @@ void LED_setup();
 void DC_setup();
 void ultrasonic_setup();
 void UART1_setup();
-void set_car_speed(float speed_left, float speed_right);
+void set_car_speed(float speed_left, float speed_right, float direction);
 
 
 // =======================================
@@ -103,8 +124,7 @@ float get_distance(float timeinterval);
 // =======================================
 // MANUAL MODE
 // =======================================
-void Direction(uint8_t direction, uint8_t arrow_flag);
-void Direction_display(uint8_t direction, uint8_t arrow_flag);
-
+void cal_direction(uint8_t direction, uint8_t arrow_flag);
+void direction_display(uint8_t direction, uint8_t arrow_flag);
 
 #endif //RC_CAR_H
