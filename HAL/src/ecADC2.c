@@ -26,7 +26,7 @@ void ADC_init(PinName_t pinName){  // trigmode 0 : SW, 1 : TRGO
 	// GPIO configuration ---------------------------------------------------------------------
 	// 1. Initialize GPIO port and pin as ANALOG, no pull up / pull down
 	GPIO_init(pinName, ANALOG);  			// ANALOG = 3
-	GPIO_pupd(pinName, EC_NONE);  			// EC_NONE = 0
+	GPIO_pupd(pinName, NO_PULLUP_PULLDOWN);  			// EC_NONE = 0
 
 	// ADC configuration	---------------------------------------------------------------------
 	// 1. Total time of conversion setting
@@ -60,11 +60,11 @@ void ADC_init(PinName_t pinName){  // trigmode 0 : SW, 1 : TRGO
 
 	// 4. Single(one) Channel or Scan(multi-channel) mode
 	// Configure the sequence length		// default: one-channel length
-	ADC1->SQR1 &= ~(0b1111 << 20); 				// 0000: one channel length in the regular channel conversion sequence
+	ADC1->SQR1 &= ~ADC_SQR1_L; 				// 0000: one channel length in the regular channel conversion sequence
 
 	// Configure the multiple channel sampling sequence
 	ADC1->SQR3 &= ~ADC_SQR3_SQ1;			// SQ1 clear
-	ADC1->SQR3 |= (chN & 0b11111) << ADC_SQR3_SQ1_Pos; 		// Choose the first channelID to sample
+	ADC1->SQR3 |= (chN & 0x1F) << ADC_SQR3_SQ1_Pos; 		// Choose the first channelID to sample
 				// chN & ADC_SQR3_SQ1;
 
 
@@ -103,11 +103,12 @@ void ADC_trigger(TIM_TypeDef* TIMx, int msec, int edge){
 	// Enable TIMx Clock as TRGO mode
 	// 1. TIMx Trigger Output Config
 	// Enable TIMx Clock
+	// Set PSC, ARR
 	TIM_init(TIMx, M_SEC, msec);
 	TIMx->CR1 &= ~TIM_CR1_CEN; 								// counter disable
 
-	// Set PSC, ARR
-	TIM_period_ms(TIMx, msec);
+
+
 
 	// Master Mode Selection MMS[2:0]: Trigger output (TRGO)
 	TIMx->CR2 &= ~TIM_CR2_MMS; 								// reset MMS
@@ -227,7 +228,7 @@ void JADC_init(PinName_t pinName){
 	// GPIO configuration ---------------------------------------------------------------------
 	// 1. Initialize GPIO port and pin as ANALOG, no pull up / pull down
 	GPIO_init(pinName, ANALOG);  			// ANALOG = 3
-	GPIO_pupd(pinName, EC_NONE);  			// EC_NONE = 0
+	GPIO_pupd(pinName, NO_PULLUP_PULLDOWN);  			// EC_NONE = 0
 
 	// ADC configuration	---------------------------------------------------------------------
 	// 1. Total time of conversion setting
@@ -349,17 +350,16 @@ void JADC_sequence(PinName_t *seqCHn, int seqCHnums){
 	for(int k=0; k<seqCHnums; k++)							// ADC Channel <->Port/Pin mapping
 		ADC_pinmap(seqCHn[k], &(chN[k]));
 
-	//ADC1->JSQR &= ~(0xF<<20); 							// reset length of conversions in the regular channel
-	ADC1->JSQR &= ~ADC_JSQR_JL;
+	ADC1->JSQR &= ~ADC_JSQR_JL; 							// reset length of conversions in the regular channel
 	ADC1->JSQR |= (seqCHnums-1) << ADC_JSQR_JL_Pos; 		// conversions in the regular channel conversion sequence
+	// ADC1->JSQR &= ~ADC_JSQR_JL;
 
 	for(int i = 0; i<seqCHnums; i++){
-		// ADC1->JSQR &= ~(0x1F<<(15 - 5 * (seqCHnums - i - 1)));	// SQ1 clear bits
-		// ADC1->JSQR |= chN[i]<<(15 - 5 * (seqCHnums - i - 1));		// Choose the channel to convert sequence
-		ADC1->JSQR &= ~(0x1F << (i*5));
-		ADC1->JSQR |= (chN[i] & 0x1F) << (i*5);
+		// ADC1->JSQR &= ~(0x1F << (i*5));
+		// ADC1->JSQR |= (chN[i] & 0x1F) << (i*5);
+		ADC1->JSQR &= ~(0x1F<<(15 - 5 * (seqCHnums - i - 1)));	// SQ1 clear bits
+		ADC1->JSQR |= chN[i]<<(15 - 5 * (seqCHnums - i - 1));		// Choose the channel to convert sequence
 	}
-
 	// Start ADC
 	JADC_start();
 }
@@ -388,7 +388,7 @@ void clear_ADC_JEOC(void){
 }
 
 ///////////////////////////////////////////////////
-void ADC_pinmap(PinName_t pinName, uint32_t *chN){
+void ADC_pinmap(PinName_t pinName, int *chN){
 	GPIO_TypeDef *port;
 	unsigned int pin;
 	ecPinmap(pinName, &port, &pin);
@@ -423,3 +423,4 @@ void ADC_pinmap(PinName_t pinName, uint32_t *chN){
 		}
 	}
 }
+
