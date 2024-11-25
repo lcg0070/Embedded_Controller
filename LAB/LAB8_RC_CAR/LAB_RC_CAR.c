@@ -29,7 +29,6 @@ int main(void) {
 
     // Inifinite Loop ----------------------------------------------------------
     while(1) {
-        printf("%lu IR1\t %lu IR2\t distance = %f\t mode = %d \r\n", IR_Value[0], IR_Value[1], ultrasonic_distance, mode);
         motor_control(IR_Value, ultrasonic_distance, btData, mode);
     }
 }
@@ -64,15 +63,13 @@ void TIM3_IRQHandler(void){
 // ultra sonic interrupt
 void TIM4_IRQHandler(void){
     ultrasonic_distance = get_distance(ultrasonic_control());
-    if (ultrasonic_distance > 1000) ultrasonic_distance = ULTRASONIC_THRESHOLD + 1;
-    if(ultrasonic_distance < 0) ultrasonic_distance = ULTRASONIC_THRESHOLD + 1;             // overflow
+    if (fabsf(ultrasonic_distance) > ULTRASONIC_THRESHOLD) ultrasonic_distance = ULTRASONIC_THRESHOLD + 1;
 }
 
 // IR sensor interrupt
 void ADC_IRQHandler(void){
     IR_control(IR_Value);
 }
-
 
 void USART1_IRQHandler() {  // USART1 interrupt handler
     if (is_USART_RXNE(USART1)) {
@@ -87,9 +84,12 @@ void USART1_IRQHandler() {  // USART1 interrupt handler
                 arrow_flag = 1;
             }
         }
-        cal_direction(btData, arrow_flag);             // Execute direction control based on btData
-        direction_display(btData, arrow_flag);         // Display current direction command
+        Direction(btData, arrow_flag);             // Execute direction control based on btData
+        Direction_display(btData, arrow_flag);     // Display current direction command
         if( btData == MODE_CHANGE1 || btData == MODE_CHANGE2) {
+            set_car_dir(FORWARD_DIR);
+            PWM_duty(PWM_PIN1, 0);       // Maintain right side speed
+            PWM_duty(PWM_PIN2, 0); // Reduce left side speed
             mode = mode_toggle(mode);
         }
     }
