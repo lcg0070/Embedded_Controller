@@ -12,18 +12,30 @@
 
 
 // =======================================
-// setup
+// Communication Send
 // =======================================
+#define COMMUNICATION_SEND_PINA PA_6
+#define COMMUNICATION_SEND_PINB PB_6
+#define COMMUNICATION_SEND_PINC PC_7
+#define COMMUNICATION_SEND_PIND PB_10
 
-// main
+
+
+
+// =======================================
+// Common
+// =======================================
 
 void UART1_setup();
 void LED_setup();
 
 
+// =======================================
+// Communication Send
+// =======================================
 
-// communication_send
-
+void communication_send_setup();
+void communication_send_init();
 
 
 
