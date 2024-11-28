@@ -10,6 +10,7 @@
 #ifndef SMARTFARM_HANI_H
 #define SMARTFARM_HANI_H
 
+#include "stm32f411xe.h"
 
 // =======================================
 // Communication Send
@@ -36,8 +37,15 @@ void LED_setup();
 
 void communication_send_setup();
 void communication_send_init();
+void process_button_states(uint8_t *button_state_current, uint8_t *button_state_history);
 
 
+
+// =======================================
+// Communication Receive
+// =======================================
+void communication_recieve_setup();
+void communication_recieve_init();
 
 
 #endif //SMARTFARM_HANI_H

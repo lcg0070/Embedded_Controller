@@ -27,7 +27,6 @@ void UART1_setup() {
 
 
 
-
 // =======================================
 // Communication Send
 // =======================================
@@ -37,8 +36,9 @@ void communication_send_setup() {
     RCC_PLL_init();
     SysTick_init();
 
-    UART1_setup();
+    LED_setup();
     communication_send_init();
+    UART1_setup();
 }
 
 
@@ -59,4 +59,39 @@ void communication_send_init() {
     GPIO_otype(LED_PIN, OUTPUT_PUSH_PULL);
     GPIO_pupd(LED_PIN, PULL_DOWN);
     GPIO_ospeed(LED_PIN, MEDIUM_SPEED);
+}
+
+
+
+
+void process_button_states(uint8_t *button_state_current, uint8_t *button_state_history) {
+    *button_state_current = 0;
+    for (int i = 0; i<4; i++) {
+        *button_state_current |= (GPIO_read(pin[i]) == HIGH) << i;
+    }
+    uint8_t changed_buttons = *button_state_current ^ *button_state_history;
+    *button_state_history = *button_state_current;
+
+    if (changed_buttons) {
+        USART1_write(button_state_current, sizeof(*button_state_current));
+        if (*button_state_current) {
+            GPIO_write(LED_PIN, HIGH);
+        } else {
+            GPIO_write(LED_PIN, LOW);
+        }
+    }
+    delay_ms(100);
+}
+
+
+// =======================================
+// Communication Receive
+// =======================================
+
+void communication_recieve_setup() {
+    RCC_PLL_init();
+    SysTick_init();
+
+    LED_setup();
+    UART1_setup();
 }
