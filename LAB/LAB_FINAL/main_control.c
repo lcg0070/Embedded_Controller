@@ -1,66 +1,50 @@
-// /*----------------------------------------------------------------\
-// Author           : Lee ChanKeun
-// Created          : 11-19-2024
-// Modified         : 11-19-2024
-// Language/ver     : C in CLION with platformio
-//
-// Description      : LAB_Final_Main
-// /----------------------------------------------------------------*/
 
-#include <math.h>
-#include "smartFarm_Hani.h"
-#include "stm32f411xe.h"
+
+#include <string.h>
 #include "ecSTM32F4.h"
+#include "smartFarm_Hani.h"
 
+// Flags
+// 0: AUTO, MANUAL            ON,OFF
+// 1: WATER_MOTOR             ON,OFF
+// 2: Hydroponic_Nutrients    ON,OFF
+// 3: LED, MAIN_PUMP          ON,OFF
+uint8_t flags[4] = {0, 0, 0, 0};
 
-int temp = 0;
+float pHValue = 7.25;
+char currentTime[6] = "12:34";
 
-uint8_t btData = 0;
+void sendDataUART2(float pH, char* time);
 
-void setup(void);
-
-int main(void) {
-    // Initialiization --------------------------------------------------------
-    setup();
-
-    // Inifinite Loop ----------------------------------------------------------
-    while(1) {
-        if(GPIO_read(PA_7)) {
-            GPIO_write(LED_PIN,1);
-        }else {
-            GPIO_write(LED_PIN,0);
+int main() {
+    main_setup();
+    while (1) {
+        pHValue = 10.0;
+        for(int i = 0; i < 4; i++) {
+            if(flags[i] == HIGH) {
+                GPIO_write(LED_PIN, HIGH);
+                pHValue = 0.0;
+                break;
+            }
         }
+        delay_ms(100);
+        GPIO_write(LED_PIN, LOW);
 
+        sendDataUART2(pHValue, currentTime);
     }
 }
 
-// Initialiization
-void setup(void){
-    RCC_PLL_init();                 // System Clock = 84MHz
-    SysTick_init();			         // SysTick Init
 
-    // each setup
-    // UART1_setup();
-    LED_setup();
-    GPIO_init(PA_7, INPUT);
-    GPIO_otype(PA_7, OUTPUT_PUSH_PULL);
-    GPIO_pupd(PA_7, NO_PULLUP_PULLDOWN);
-    GPIO_ospeed(PA_7, MEDIUM_SPEED);
+// USART1 IRQ Handler for Bluetooth Communication
+void USART1_IRQHandler() {
+    blutooth_data2flag(flags);
 }
 
 
+// USART2를 통해 pH 값과 시간 송신
+void sendDataUART2(float pH, char* time) {
+    uint8_t buffer[32];
+    sprintf(buffer, "%.2f,%s", pH, time); // "pH값,시간" 형식
+    USART2_write((uint8_t *)buffer, sizeof(buffer));
+}
 
-
-// =======================================
-// interrupt
-// =======================================
-
-
-// void USART1_IRQHandler() {  // USART1 interrupt handler
-//      if (is_USART_RXNE(USART1)) {
-//          int arrow_flag = 0;
-//          btData = USART_read(USART1);
-//          if (btData == 1) GPIO_write(LED_PIN, temp);
-//          printf("%c", btData); // TX to USART2(PC)
-//      }
-//  }

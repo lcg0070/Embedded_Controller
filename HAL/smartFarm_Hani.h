@@ -26,9 +26,10 @@
 // =======================================
 // Common
 // =======================================
-
-void UART1_setup();
 void LED_setup();
+void UART1_setup();
+void UART2_setup();
+
 
 
 // =======================================
@@ -44,8 +45,9 @@ void process_button_states(uint8_t *button_state_current, uint8_t *button_state_
 // =======================================
 // Communication Receive
 // =======================================
+void main_setup();
 void communication_recieve_setup();
 void communication_recieve_init();
-
+void blutooth_data2flag(uint8_t flags[]);
 
 #endif //SMARTFARM_HANI_H

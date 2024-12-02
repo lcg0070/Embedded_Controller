@@ -25,6 +25,11 @@ void UART1_setup() {
     UART1_baud(BAUD_9600);
 }
 
+void UART2_setup() {
+    UART2_init();
+    UART2_baud(BAUD_9600);
+}
+
 
 
 // =======================================
@@ -40,7 +45,6 @@ void communication_send_setup() {
     communication_send_init();
     UART1_setup();
 }
-
 
 #define PIN_INDEX (int)4
 PinName_t pin[PIN_INDEX];
@@ -61,9 +65,6 @@ void communication_send_init() {
     GPIO_ospeed(LED_PIN, MEDIUM_SPEED);
 }
 
-
-
-
 void process_button_states(uint8_t *button_state_current, uint8_t *button_state_history) {
     *button_state_current = 0;
     for (int i = 0; i<4; i++) {
@@ -80,18 +81,34 @@ void process_button_states(uint8_t *button_state_current, uint8_t *button_state_
             GPIO_write(LED_PIN, LOW);
         }
     }
-    delay_ms(100);
 }
 
 
 // =======================================
 // Communication Receive
 // =======================================
-
-void communication_recieve_setup() {
+void main_setup() {
     RCC_PLL_init();
     SysTick_init();
+    communication_recieve_setup();
+}
 
+void communication_recieve_setup() {
     LED_setup();
+    UART2_setup();
     UART1_setup();
+
+}
+
+static volatile uint8_t BT_Data = 0;
+void blutooth_data2flag(uint8_t flags[]) {
+    if (is_USART1_RXNE()) {
+        BT_Data = USART1_read();
+        if(BT_Data == 0) return;
+        for (int i = 0; i < 4; i++) {
+            if ( BT_Data >> i & 0b1) {
+                flags[i] = !flags[i];
+            }
+        }
+    }
 }
